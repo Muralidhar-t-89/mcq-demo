@@ -16,6 +16,19 @@ class QuizAttempt:
     created_date: datetime
     id: int = None
 
+    @property
+    def questions_unattempted(self) -> int:
+        """
+        Returns the number of questions that are unattempted by the user.
+
+        Returns
+        -------
+        int
+            The count of unattempted questions.
+
+        """
+        return self.total_questions - self.questions_attempted
+
     def to_dict(self):
         dict_form = {
             "id": self.id,

@@ -4,7 +4,7 @@ import dataclasses
 
 @dataclasses.dataclass
 class AttemptQuestion:
-    attempt_id: str
+    attempt_id: int
     question_id: int
     attempted_answer: str
     is_correct: bool
