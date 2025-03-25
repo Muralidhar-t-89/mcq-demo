@@ -1,0 +1,10 @@
+# PyCharm files
+.idea/
+
+# VSCode files
+.vscode/
+*.code-workspace
+
+# Venv
+.venv/
+venv/
