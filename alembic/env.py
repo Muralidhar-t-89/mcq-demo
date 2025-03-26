@@ -1,14 +1,28 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from src.app.orm.mcq_orm import mcq
+from src.app.orm.mcq_orm import metadata
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_USER = os.getenv("DB_USER", "default_user")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "default_password")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "default_db")
+
+DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+fileConfig(config.config_file_name)
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -19,7 +33,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = mcq.metadata
+target_metadata = metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

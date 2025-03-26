@@ -1,18 +1,29 @@
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker, Session
+
+from src.app.config import settings
 
 
-def build_new_sqlite_db():
-    engine = create_engine("sqlite+pysqlite:///mcq_database.db", echo=True)
+DATABASE_URL = (
+        f"postgresql+psycopg2://{settings.DB_USER}:{settings.DB_PASSWORD}@"
+        f"{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
+    )
 
+engine = create_engine(DATABASE_URL, echo=True)
+
+DEFAULT_SESSION_FACTORY = sessionmaker(bind=create_engine(DATABASE_URL), autocommit=False, autoflush=False)
+
+
+def build_postgresql_engine():
     with engine.connect() as conn:
         conn.execute(
             text(
                 """
                 CREATE TABLE IF NOT EXISTS categories (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT UNIQUE NOT NULL,
-                    created_by INTEGER NOT NULL,
-                    created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(255) UNIQUE NOT NULL,
+                    created_by INTEGER NOT NULL,    
+                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 """
             )
@@ -22,13 +33,13 @@ def build_new_sqlite_db():
             text(
                 """
                 CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    first_name TEXT NOT NULL,
-                    last_name TEXT NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
+                    id SERIAL PRIMARY KEY,
+                    first_name VARCHAR(100) NOT NULL,
+                    last_name VARCHAR(100) NOT NULL,
+                    email VARCHAR(255) UNIQUE NOT NULL,
                     password TEXT NOT NULL,
                     role INTEGER NOT NULL,
-                    created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 """
             )
@@ -38,13 +49,13 @@ def build_new_sqlite_db():
             text(
                 """
                 CREATE TABLE IF NOT EXISTS mcq (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id SERIAL PRIMARY KEY,
                     question TEXT NOT NULL,
-                    options TEXT NOT NULL,
-                    correct_option TEXT NOT NULL,
+                    options TEXT[] NOT NULL,
+                    correct_option TEXT[] NOT NULL,
                     category INTEGER NOT NULL,
                     created_by INTEGER NOT NULL,
-                    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (category) REFERENCES categories (id),
                     FOREIGN KEY (created_by) REFERENCES users (id)
                 );
@@ -56,7 +67,7 @@ def build_new_sqlite_db():
             text(
                 """
                 CREATE TABLE IF NOT EXISTS quiz_attempts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id SERIAL PRIMARY KEY,
                     user_id INTEGER NOT NULL,
                     attempt_id INTEGER UNIQUE NOT NULL,
                     category_id INTEGER NOT NULL,
@@ -65,7 +76,7 @@ def build_new_sqlite_db():
                     questions_unattempted INTEGER NOT NULL,
                     correct_answers INTEGER NOT NULL,
                     score INTEGER NOT NULL,
-                    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id),
                     FOREIGN KEY (category_id) REFERENCES categories (id)
                 );
@@ -77,7 +88,7 @@ def build_new_sqlite_db():
             text(
                 """
                 CREATE TABLE IF NOT EXISTS attempt_questions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id SERIAL PRIMARY KEY,
                     attempt_id INTEGER NOT NULL,
                     question_id INTEGER NOT NULL,
                     attempted_answer TEXT NOT NULL,
@@ -92,5 +103,13 @@ def build_new_sqlite_db():
         conn.commit()
 
 
+def get_db():
+    db = DEFAULT_SESSION_FACTORY()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 if __name__ == "__main__":
-    build_new_sqlite_db()
+    build_postgresql_engine()

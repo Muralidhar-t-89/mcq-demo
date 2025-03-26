@@ -2,15 +2,22 @@ import abc
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from src.app.build_db import DEFAULT_SESSION_FACTORY
+from src.app.config import settings
 from src.app.repositories.category_repository import CategoryRepository
 from src.app.repositories.log_repo import LogRepository
 from src.app.repositories.mcq_repository import MCQRepository
 from src.app.repositories.quiz_attempt_repository import QuizAttemptRepository
 from src.app.repositories.user_repository import UserRepository
 
-DEFAULT_SESSION_FACTORY = sessionmaker(
-    bind=create_engine("sqlite+pysqlite:///database.db", echo=True)
-)
+# DATABASE_URL = (
+#     f"postgresql+psycopg2://{settings.DB_USER}:{settings.DB_PASSWORD}@"
+#     f"{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
+# )
+#
+# DEFAULT_SESSION_FACTORY = sessionmaker(
+#     bind=create_engine(DATABASE_URL, echo=True)
+# )
 
 
 class BaseUnitOfWork(abc.ABC):
@@ -46,7 +53,7 @@ class MCQUnitOfWork(BaseUnitOfWork):
         self.category_repo = CategoryRepository(session=self.session)
         self.quiz_attempt_repo = QuizAttemptRepository(session=self.session)
         self.log_repo = LogRepository(session=self.session)
-        return super().__enter__()
+        return self #super().__enter__()
 
     def __exit__(self, *args):
         super().__exit__(*args)
