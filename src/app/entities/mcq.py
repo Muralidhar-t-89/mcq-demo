@@ -1,7 +1,7 @@
 import json
 import dataclasses
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 
 @dataclasses.dataclass
@@ -12,6 +12,8 @@ class MCQ:
     category: str
     created_by: int
     created_date: datetime
+    updated_by: Optional[int] = None
+    updated_date: Optional[datetime] = None
     id: int = None
 
     def to_dict(self):
@@ -22,7 +24,9 @@ class MCQ:
             "correct_option": self.correct_option,
             "category": self.category,
             "created_by": self.created_by,
-            "created_date": self.created_date
+            "created_date": self.created_date,
+            "updated_by": self.updated_by,
+            "updated_date": self.updated_date
         }
 
         return dict_form
@@ -50,5 +54,7 @@ def build_mcq_from_object(series: dict) -> MCQ:
         correct_option=series["correct_option"],
         category=series["category"],
         created_by=series["created_by"],
-        created_date=series["created_date"]
+        created_date=series["created_date"],
+        updated_by=series["updated_by"],
+        updated_date=series["updated_date"]
     )

@@ -1,6 +1,7 @@
 from datetime import datetime
-from sqlalchemy import ARRAY, Boolean, Column, DateTime, Integer, MetaData, String, Table, Text, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, MetaData, String, Table, Text
 from sqlalchemy.orm import registry
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from src.app.entities.quiz_attempt_questions import AttemptQuestion
 from src.app.entities.category import Category
@@ -23,6 +24,8 @@ mcq = Table(
     Column("correct_option", ARRAY(String), nullable=False),
     Column("created_by", Integer, ForeignKey('users.id'), nullable=False),
     Column("created_date", DateTime, default=datetime.now()),
+    Column("updated_by", Integer, ForeignKey('roles.id'), nullable=True),
+    Column("updated_date", DateTime, onupdate=datetime.now()),
 )
 
 user = Table(
@@ -32,7 +35,7 @@ user = Table(
     Column("first_name", String, nullable=False),
     Column("last_name", String, nullable=False),
     Column("email", String, unique=True, nullable=False),
-    Column("password", String(128), nullable=False),
+    Column("password", String, nullable=False),
     Column("role", Integer, ForeignKey('roles.id'), nullable=False),
     Column("created_date", DateTime, default=datetime.now(), nullable=False),
 )
@@ -77,7 +80,9 @@ categories = Table(
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("name", String(50), unique=True, nullable=False),
     Column("created_by", Integer, ForeignKey('users.id'), nullable=False),
-    Column("created_date", DateTime, default=datetime.now(), nullable=False),
+    Column("created_date", DateTime, default=datetime.now()),
+    Column("updated_by", Integer, ForeignKey('users.id'), nullable=True),
+    Column("updated_date", DateTime, onupdate=datetime.now())
 )
 
 
