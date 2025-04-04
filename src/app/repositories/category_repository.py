@@ -8,21 +8,20 @@ class CategoryRepository(BaseRepository):
     def __init__(self, session: Session):
         self.session = session
 
-    def get_one(self, item_id: int):
+    def get_one(self, item_id: int) -> Category | None:
         """
         Retrieve a single category by ID
         """
         selected_category = self.session.query(Category).filter_by(id=item_id).first()
-        if selected_category is not None:
-            return selected_category
-        else:
-            return None
+        return selected_category
 
     def get_all(self) -> list[Category]:
         """
         Retrieve all categories
         """
-        return self.session.query(Category).all()
+        all_categories = self.session.query(Category).all()
+        print("Categories queried db:", all_categories)
+        return all_categories
 
     def add(self, category: Category) -> Category:
         """
@@ -32,14 +31,14 @@ class CategoryRepository(BaseRepository):
         self.session.commit()
         return category
 
-    def update(self, category: Category):
+    def update(self, category: Category) -> Category | None:
         """
         Update an existing category
         """
         existing_category = self.session.query(Category).filter_by(id=category.id).first()
+        print("existing_category:", existing_category)
         if existing_category:
             existing_category.name = category.name
-            existing_category.created_by = category.created_by
             self.session.commit()
         return existing_category
 
@@ -48,6 +47,7 @@ class CategoryRepository(BaseRepository):
         Delete a category from the database
         """
         category = self.session.query(Category).filter_by(id=category_id).first()
+        print("category queried db:", category)
         if category:
             self.session.delete(category)
             self.session.commit()
