@@ -13,7 +13,7 @@ class User:
     created_date: datetime
     id: int = None
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         dict_form = {
             "id": self.id,
             "first_name": self.first_name,
@@ -25,7 +25,7 @@ class User:
         }
         return dict_form
 
-    def to_json(self):
+    def to_json(self) -> str:
         dict_form = self.to_dict()
         return json.dumps(dict_form)
 
