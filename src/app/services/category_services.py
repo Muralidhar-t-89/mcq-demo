@@ -8,6 +8,9 @@ from src.app.entities.category import Category
 
 
 def get_all_categories(unit_of_work: MCQUnitOfWork) -> list[Category]:
+    """
+    Fetches all categories from the database.
+    """
     with unit_of_work as uow:
         categories = uow.category_repo.get_all()
         print("categories:", categories)
@@ -16,13 +19,19 @@ def get_all_categories(unit_of_work: MCQUnitOfWork) -> list[Category]:
 
 
 async def get_category_by_id(category_id: int, unit_of_work: MCQUnitOfWork) -> Category | None:
-    async with unit_of_work as uow:
-        category = await uow.category_repo.get_by_id(category_id)
+    """
+    Fetches a category by its ID from the database.
+    """
+    with unit_of_work as uow:
+        category = uow.category_repo.get_one(category_id)
+        print("category by ID:", category)
         return category.to_dict() if category else None
 
 
 async def create_category(category_data: CategoryCreate, admin_user, unit_of_work: MCQUnitOfWork) -> Category:
-
+    """
+    Creates a new category in the database.
+    """
     new_category = Category(
         name=category_data.name,
         created_by=admin_user.id,
@@ -42,10 +51,11 @@ async def create_category(category_data: CategoryCreate, admin_user, unit_of_wor
 
 async def update_category(category_id: int, category_data: CategoryUpdate, admin_user,
                           unit_of_work: MCQUnitOfWork) -> Category | None:
-
+    """
+    Updates an existing category in the database.
+    """
     with unit_of_work as uow:
         category = uow.category_repo.get_one(category_id)
-        print("category:", category)
         if not category:
             raise HTTPException(status_code=404, detail="Category not found")
 
@@ -64,16 +74,17 @@ async def update_category(category_id: int, category_data: CategoryUpdate, admin
 
 
 async def delete_category(category_id: int, admin_user, unit_of_work: MCQUnitOfWork) -> bool:
+    """
+    Deletes a category from the database.
+    """
 
     with unit_of_work as uow:
         category = uow.category_repo.get_one(category_id)
-        print("got the category:", category)
         if not category:
             raise HTTPException(status_code=404, detail="Category not found")
 
         try:
             result = uow.category_repo.delete(category_id)
-            print("result:", result)
             uow.commit()
             return result
         except SQLAlchemyError:

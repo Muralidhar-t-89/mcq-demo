@@ -25,9 +25,10 @@ async def get_one_category(id: int) -> category_schema.Category:
     """
     Endpoint to retrieve a single category by ID.
     """
-    category = await category_services.get_category_by_id(category_id=id, unit_of_work=MCQUnitOfWork())
-    if category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
+    with MCQUnitOfWork() as uow:
+        category = await category_services.get_category_by_id(category_id=id, unit_of_work=uow)
+        if category is None:
+            raise HTTPException(status_code=404, detail="Category not found")
     return category
 
 
