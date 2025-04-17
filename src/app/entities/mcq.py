@@ -9,7 +9,7 @@ class MCQ:
     question: str
     options: List[str]
     correct_option: List[str]
-    category: str
+    category: int
     created_by: int
     created_date: datetime
     updated_by: Optional[int] = None
