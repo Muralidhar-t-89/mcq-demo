@@ -10,23 +10,24 @@ class QuizAttempt:
     category_id: int
     total_questions: int
     questions_attempted: int
+    questions_unattempted: int
     correct_answers: int
     score: int
     created_date: datetime
     id: int = None
 
-    @property
-    def questions_unattempted(self) -> int:
-        """
-        Returns the number of questions that are unattempted by the user.
-
-        Returns
-        -------
-        int
-            The count of unattempted questions.
-
-        """
-        return self.total_questions - self.questions_attempted
+    # @property
+    # def questions_unattempted(self) -> int:
+    #     """
+    #     Returns the number of questions that are unattempted by the user.
+    #
+    #     Returns
+    #     -------
+    #     int
+    #         The count of unattempted questions.
+    #
+    #     """
+    #     return self.total_questions - self.questions_attempted
 
     def to_dict(self):
         dict_form = {
@@ -67,6 +68,7 @@ def build_quiz_attempt_from_object(series: dict) -> QuizAttempt:
         category_id=series["category_id"],
         total_questions=series["total_questions"],
         questions_attempted=series["questions_attempted"],
+        questions_unattempted=series["questions_unattempted"],
         correct_answers=series["correct_answers"],
         score=series["score"],
         created_date=series["created_date"]
