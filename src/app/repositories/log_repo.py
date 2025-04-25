@@ -7,7 +7,7 @@ class LogRepository(BaseRepository):
     def __init__(self, session: Session):
         self.session = session
 
-    def get_one(self, item_id: int) -> Log:
+    def get_one(self, item_id: int) -> Log | None:
         """
         Retrieve a single log by its ID
         """
