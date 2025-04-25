@@ -32,7 +32,7 @@ async def register_user(user_data: user_schema.UserCreate):
         logger.error(f"Unexpected Error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@user_blueprint.post("/login")
+@user_blueprint.post("/login", response_model=user_schema.UserLogin)
 async def login_user(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Endpoint to log in and generate a JWT token.
